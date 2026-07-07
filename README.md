@@ -1,53 +1,53 @@
 # Azure Storage Account Automation using PowerShell and Service Principal
 
-## Opis zadania
+## Task Description
 
-Celem zadania było zaprojektowanie i wykonanie procesu automatyzacji infrastruktury chmurowej w Microsoft Azure przy użyciu PowerShella oraz Service Principala.
+The goal of this task was to design and implement a cloud infrastructure automation process in Microsoft Azure using PowerShell and a Service Principal.
 
-Skrypt loguje się do Azure bez interaktywnego logowania użytkownika w przeglądarce, a następnie automatycznie tworzy zasób typu Azure Storage Account w dedykowanej Resource Group.
+The script logs in to Azure without requiring interactive user authentication in a browser, and then automatically creates an Azure Storage Account resource in a dedicated Resource Group.
 
-## Wykorzystane technologie
+## Technologies Used
 
-- Microsoft Azure
-- PowerShell
-- Azure PowerShell module `Az`
-- Service Principal
-- Azure Role-Based Access Control
-- Azure Storage Account
+* Microsoft Azure
+* PowerShell
+* Azure PowerShell module `Az`
+* Service Principal
+* Azure Role-Based Access Control
+* Azure Storage Account
 
-## Założenia rozwiązania
+## Solution Assumptions
 
-W rozwiązaniu wykorzystano Service Principal, czyli konto techniczne przeznaczone dla aplikacji, skryptów i procesów automatyzujących.
+The solution uses a Service Principal, which is a technical account intended for applications, scripts, and automation processes.
 
-Service Principal uwierzytelnia się do Azure za pomocą trzech głównych parametrów:
+The Service Principal authenticates to Azure using three main parameters:
 
-- `tenant_id` — identyfikator katalogu Microsoft Entra ID,
-- `client_id` — Application ID utworzonego Service Principala,
-- `client_secret` — sekret używany jako hasło techniczne.
+* `tenant_id` — the identifier of the Microsoft Entra ID directory,
+* `client_id` — the Application ID of the created Service Principal,
+* `client_secret` — the secret used as a technical password.
 
-Po poprawnym uwierzytelnieniu skrypt uzyskuje dostęp do wybranej subskrypcji Azure i wykonuje operacje w określonym zakresie uprawnień.
+After successful authentication, the script gains access to the selected Azure subscription and performs operations within the defined permission scope.
 
-## Zakres uprawnień
+## Permission Scope
 
-Service Principal otrzymał rolę:
+The Service Principal was assigned the following role:
 
 ```text
 Contributor
 ```
 
-na poziomie dedykowanej Resource Group:
+at the level of the dedicated Resource Group:
 
 ```text
 rg-rekrutacja-patryk
 ```
 
-Dzięki temu konto techniczne może tworzyć i zarządzać zasobami tylko w tej konkretnej Resource Group, a nie w całej subskrypcji.
+As a result, the technical account can create and manage resources only within this specific Resource Group, not across the entire subscription.
 
-Takie podejście ogranicza zakres dostępu i jest bezpieczniejsze niż nadawanie uprawnień globalnych.
+This approach limits the access scope and is safer than assigning global permissions.
 
-## Utworzony zasób
+## Created Resource
 
-W ramach zadania utworzono Azure Storage Account:
+As part of the task, the following Azure Storage Account was created:
 
 ```text
 Storage Account Name: stpatryk16882
@@ -58,24 +58,24 @@ Kind: StorageV2
 ProvisioningState: Succeeded
 ```
 
-## Jak działa skrypt
+## How the Script Works
 
-Skrypt wykonuje następujące kroki:
+The script performs the following steps:
 
-1. Pobiera dane uwierzytelniające Service Principala ze zmiennych środowiskowych.
-2. Sprawdza, czy wymagane zmienne są ustawione.
-3. Tworzy obiekt `PSCredential` na podstawie `client_id` oraz `client_secret`.
-4. Loguje się do Azure za pomocą polecenia `Connect-AzAccount` z parametrem `-ServicePrincipal`.
-5. Ustawia odpowiedni kontekst subskrypcji.
-6. Sprawdza, czy Storage Account już istnieje.
-7. Jeśli Storage Account nie istnieje, tworzy go za pomocą `New-AzStorageAccount`.
-8. Jeśli Storage Account już istnieje, wyświetla informację i nie tworzy duplikatu.
+1. Retrieves the Service Principal credentials from environment variables.
+2. Checks whether the required variables are set.
+3. Creates a `PSCredential` object based on the `client_id` and `client_secret`.
+4. Logs in to Azure using the `Connect-AzAccount` command with the `-ServicePrincipal` parameter.
+5. Sets the correct subscription context.
+6. Checks whether the Storage Account already exists.
+7. If the Storage Account does not exist, it creates it using `New-AzStorageAccount`.
+8. If the Storage Account already exists, it displays an informational message and does not create a duplicate.
 
-## Bezpieczeństwo
+## Security
 
-Wrażliwe dane, takie jak `client_secret`, nie są zapisane bezpośrednio w kodzie.
+Sensitive data, such as `client_secret`, is not stored directly in the code.
 
-Skrypt korzysta ze zmiennych środowiskowych:
+The script uses environment variables:
 
 ```powershell
 $env:AZURE_TENANT_ID
@@ -84,27 +84,27 @@ $env:AZURE_CLIENT_SECRET
 $env:AZURE_SUBSCRIPTION_ID
 ```
 
-Dzięki temu sekret Service Principala nie jest przechowywany w repozytorium GitHub.
+This ensures that the Service Principal secret is not stored in the GitHub repository.
 
-## Wymagania
+## Requirements
 
-Przed uruchomieniem skryptu należy posiadać:
+Before running the script, the following requirements must be met:
 
-- konto Azure,
-- dostęp do wskazanej subskrypcji,
-- zainstalowany moduł `Az` dla PowerShella,
-- utworzonego Service Principala,
-- nadaną rolę `Contributor` na dedykowanej Resource Group.
+* an Azure account,
+* access to the selected subscription,
+* the `Az` PowerShell module installed,
+* a created Service Principal,
+* the `Contributor` role assigned to the Service Principal on the dedicated Resource Group.
 
-Instalacja modułu `Az`:
+Installation of the `Az` module:
 
 ```powershell
 Install-Module Az -Scope CurrentUser -Repository PSGallery -Force
 ```
 
-## Konfiguracja zmiennych środowiskowych
+## Environment Variable Configuration
 
-Przed uruchomieniem skryptu należy ustawić wymagane zmienne środowiskowe:
+Before running the script, the required environment variables must be set:
 
 ```powershell
 $env:AZURE_TENANT_ID = "YOUR_TENANT_ID"
@@ -113,19 +113,19 @@ $env:AZURE_CLIENT_SECRET = "YOUR_CLIENT_SECRET"
 $env:AZURE_SUBSCRIPTION_ID = "YOUR_SUBSCRIPTION_ID"
 ```
 
-Wartości `tenant_id`, `client_id`, `client_secret` i `subscription_id` nie powinny być zapisywane bezpośrednio w kodzie źródłowym.
+The values of `tenant_id`, `client_id`, `client_secret`, and `subscription_id` should not be stored directly in the source code.
 
-## Uruchomienie skryptu
+## Running the Script
 
-Aby uruchomić skrypt, należy wykonać polecenie:
+To run the script, execute the following command:
 
 ```powershell
 .\create-storage.ps1
 ```
 
-## Przykładowy rezultat
+## Example Result
 
-Po poprawnym wykonaniu skryptu Storage Account został utworzony w Azure:
+After the script was executed successfully, the Storage Account was created in Azure:
 
 ```text
 StorageAccountName ResourceGroupName    PrimaryLocation SkuName      Kind      AccessTier ProvisioningState
@@ -133,21 +133,21 @@ StorageAccountName ResourceGroupName    PrimaryLocation SkuName      Kind      A
 stpatryk16882      rg-rekrutacja-patryk westeurope      Standard_LRS StorageV2 Hot        Succeeded
 ```
 
-Stan `Succeeded` potwierdza, że zasób został utworzony poprawnie.
+The `Succeeded` state confirms that the resource was created correctly.
 
-## Podsumowanie
+## Summary
 
-W trakcie realizacji zadania wykonano następujące kroki:
+During the task, the following steps were completed:
 
-- zalogowano się do Azure przy użyciu konta użytkownika,
-- utworzono Service Principala,
-- nadano Service Principalowi rolę `Contributor` na Resource Group,
-- zalogowano się do Azure jako Service Principal,
-- utworzono Storage Account za pomocą PowerShella,
-- potwierdzono utworzenie zasobu poleceniem `Get-AzStorageAccount`.
+* logged in to Azure using a user account,
+* created a Service Principal,
+* assigned the `Contributor` role to the Service Principal on the Resource Group,
+* logged in to Azure as the Service Principal,
+* created a Storage Account using PowerShell,
+* confirmed the resource creation using the `Get-AzStorageAccount` command.
 
-## Wnioski
+## Conclusions
 
-Zadanie potwierdza, że możliwe jest automatyczne tworzenie zasobów w Azure bez interaktywnego logowania człowieka w przeglądarce.
+This task confirms that it is possible to automatically create resources in Azure without interactive human login through a browser.
 
-Uwierzytelnienie odbywa się programistycznie za pomocą Service Principala, który posiada ograniczone uprawnienia do konkretnej Resource Group. Dzięki temu skrypt może być wykorzystany w automatyzacji, na przykład w procesach CI/CD, deploymentach lub administracji infrastrukturą chmurową.
+Authentication is performed programmatically using a Service Principal with limited permissions to a specific Resource Group. As a result, the script can be used in automation scenarios, such as CI/CD processes, deployments, or cloud infrastructure administration.
