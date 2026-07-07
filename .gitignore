@@ -1,0 +1,4 @@
+.env
+*.secret
+secrets.ps1
+credentials.ps1
